@@ -1,0 +1,10 @@
+{
+  "name": "promptcanvas-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PromptCanvas AI - AI image editing web app with credits, subscriptions and admin",
+  "scripts": {
+    "test": "node tests/run.js",
+    "dev": "node tests/server.js"
+  }
+}

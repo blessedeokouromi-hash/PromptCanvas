@@ -1,0 +1,41 @@
+PASS  me: free user has 2 daily credits
+PASS  me: no token -> 401
+PASS  upload: returns storage path + url
+PASS  upload: rejects non-image
+PASS  edit bg_generate: real Pollinations result
+PASS  credits: deducted to 1 after first edit
+PASS  edit prompt_edit: clear 'needs token' error, no fake result
+PASS  credits: still 1 after failed edit (refunded, not spent)
+PASS  edit bg_generate again: second real result
+PASS  credits: deducted to 0 after second edit
+PASS  credits: 402 when free credits exhausted
+PASS  admin: can set credits
+PASS  edit bg_remove: clear key-required error
+PASS  credits: refunded automatically after failure
+PASS  history: lists the two successful edits
+PASS  history: user B sees none of user A's edits
+PASS  payments/init: helpful error when Paystack key missing
+PASS  paystack webhook: rejects bad signature
+PASS  paystack webhook: activates premium on valid signature
+PASS  premium: plan + 100 credits + 1-month expiry
+PASS  paystack webhook: idempotent (no double activation)
+PASS  credits not doubled on duplicate webhook
+PASS  premium edit works and deducts
+PASS  premium credits now 99
+PASS  flutterwave webhook: rejects wrong hash
+PASS  flutterwave webhook: activates yearly
+PASS  yearly: expiry ~12 months out, credits reset to 100
+PASS  verify: reports already-applied payment
+PASS  verify: cannot verify someone else's payment
+PASS  cron/renew: grants monthly credits
+PASS  renewal: credits back to 100
+PASS  expiry: premium downgrades to free after expiry
+PASS  admin: non-admin blocked
+PASS  admin: lists users
+PASS  admin: stats computed from real data
+PASS  admin: can grant monthly premium
+PASS  admin: saves ad placements
+PASS  ads: free users receive ad code
+PASS  ads: premium users get no ad code (premium=true)
+
+39/39 checks passed

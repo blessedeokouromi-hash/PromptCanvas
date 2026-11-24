@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Admin - PromptCanvas AI</title><link rel="icon" href="/assets/logo.svg"><link rel="stylesheet" href="/css/style.css">
+</head><body>
+<div class="wrap">
+  <nav class="nav">
+    <a class="brand" href="/"><span class="dot">P</span><span>PromptCanvas<small>ADMIN</small></span></a>
+    <div class="navlinks"><a href="/app.html">App</a><button class="btn sm ghost" onclick="signOut()">Sign out</button></div>
+  </nav>
+  <section class="section" style="padding-top:26px">
+    <div id="adminDenied" class="card hidden"><h2 class="big">Admin access required</h2><p class="mut sm" style="margin-top:8px">Sign in with an email listed in ADMIN_EMAILS, then reload this page.</p></div>
+    <div id="adminBody">
+      <div class="grid g4" style="margin-bottom:18px" id="statGrid"></div>
+      <div class="rowflex" style="margin-bottom:10px"><h2 class="big">Users</h2><span class="spacer"></span>
+        <input id="uq" placeholder="Search email…" style="max-width:240px" oninput="loadUsers()"></div>
+      <div class="card" style="margin-bottom:18px;overflow-x:auto">
+        <table id="uTable"><thead><tr><th>Email</th><th>Plan</th><th>Credits</th><th>Premium until</th><th>Joined</th><th>Actions</th></tr></thead><tbody></tbody></table>
+      </div>
+      <div class="grid g2" style="align-items:start">
+        <div class="card">
+          <h2 class="big" style="margin-bottom:12px">Payments</h2>
+          <div style="overflow-x:auto"><table id="txTable"><thead><tr><th>Date</th><th>Email ref</th><th>Plan</th><th>₦</th><th>Via</th><th>Status</th><th>Reference</th></tr></thead><tbody></tbody></table></div>
+        </div>
+        <div class="card">
+          <h2 class="big" style="margin-bottom:12px">Ad placements (Adsterra)</h2>
+          <p class="mut sm" style="margin-bottom:10px">Paste Adsterra code snippets. Shown only to free users.</p>
+          <label>728x90 / responsive banner</label><textarea id="adBanner" rows="3"></textarea>
+          <label>Native banner</label><textarea id="adNative" rows="3"></textarea>
+          <label>Social bar</label><textarea id="adSocial" rows="3"></textarea>
+          <label>Popunder</label><textarea id="adPop" rows="2"></textarea>
+          <button class="btn primary sm" style="margin-top:12px" onclick="saveAds()">Save placements</button>
+        </div>
+      </div>
+    </div>
+  </section>
+  <footer>© PromptCanvas AI</footer>
+</div>
+<div class="toasts" id="toasts"></div>
+<script src="/js/api.js"></script><script src="/js/admin.js"></script>
+</body></html>

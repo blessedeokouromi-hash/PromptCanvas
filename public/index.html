@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>PromptCanvas AI - Edit photos with AI</title>
+<meta name="description" content="Professional AI photo editing: remove backgrounds, enhance, upscale, restyle portraits and transform images with a prompt.">
+<link rel="icon" href="/assets/logo.svg"><link rel="stylesheet" href="/css/style.css">
+</head><body>
+<div class="wrap">
+  <nav class="nav">
+    <a class="brand" href="/"><span class="dot">P</span><span>PromptCanvas<small>AI IMAGE STUDIO</small></span></a>
+    <div class="navlinks">
+      <a href="#features">Features</a><a href="/pricing.html">Pricing</a>
+      <a href="/app.html" class="on" id="navDash" style="display:none">Dashboard</a>
+      <button class="btn primary sm" id="navAuth" onclick="location.href='/auth.html'">Sign in</button>
+      <a class="btn sm ghost" href="/editor.html" id="navTry" style="display:none">Open editor</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <span class="badge">Real AI editing. Free to start.</span>
+    <h1>Edit any photo<br>with a <span class="g">single prompt</span></h1>
+    <p class="sub">Remove backgrounds, restyle portraits, transform images, generate new backgrounds and upscale to 2x. Everything runs on real AI models, from one clean editor.</p>
+    <div class="rowflex" style="justify-content:center">
+      <a class="btn primary" href="/auth.html" id="ctaStart">Start free, 2 edits daily</a>
+      <a class="btn ghost" href="/pricing.html">See pricing</a>
+    </div>
+  </section>
+
+  <section class="section" id="features">
+    <h2>Everything an AI photo studio needs</h2>
+    <p class="lead">Every action costs one credit. Free accounts get 2 credits every day, Premium gets 100 every month.</p>
+    <div class="grid g3">
+      <div class="card feat"><div class="ic">✍️</div><h3>Text-prompt editing</h3><p>Describe the change in plain words and the AI edits your photo.</p></div>
+      <div class="card feat"><div class="ic">🪄</div><h3>Background removal</h3><p>Cut the subject out cleanly with AI, transparent PNG result.</p></div>
+      <div class="card feat"><div class="ic">🌆</div><h3>Background replacement &amp; generation</h3><p>Swap in a new scene by describing it, or generate a fresh background from text.</p></div>
+      <div class="card feat"><div class="ic">💎</div><h3>Enhance &amp; upscale</h3><p>Sharpen and enlarge photos up to 2x with Real-ESRGAN.</p></div>
+      <div class="card feat"><div class="ic">🧑‍🎤</div><h3>Portrait editing</h3><p>Studio lighting, retouching and professional headshot looks.</p></div>
+      <div class="card feat"><div class="ic">🧽</div><h3>Object removal</h3><p>Brush over anything you want gone and the AI fills the gap.</p></div>
+    </div>
+  </section>
+
+  <section class="section" id="pricing">
+    <h2>Simple pricing</h2>
+    <p class="lead">Pay with Paystack or Flutterwave. Activation is verified on the server, never from a redirect.</p>
+    <div class="grid g3">
+      <div class="card plancard"><span class="pill free" style="align-self:flex-start">FREE</span>
+        <div class="price">₦0</div>
+        <ul><li>2 AI credits every day</li><li>All basic editing tools</li><li>Editing history</li><li>Advert supported</li></ul>
+        <a class="btn ghost" href="/auth.html">Start free</a></div>
+      <div class="card plancard best"><span class="tag">POPULAR</span><span class="pill prem" style="align-self:flex-start">PREMIUM</span>
+        <div class="price">₦5,000 <small>/ month</small></div>
+        <ul><li>100 AI credits every month</li><li>No adverts at all</li><li>Priority AI queue</li><li>Editing history</li></ul>
+        <a class="btn primary" href="/pricing.html">Go Premium</a></div>
+      <div class="card plancard"><span class="pill prem" style="align-self:flex-start">PREMIUM</span>
+        <div class="price">₦40,000 <small>/ year</small></div>
+        <ul><li>100 credits refreshed monthly</li><li>Save ₦20,000 a year</li><li>No adverts at all</li><li>Priority AI queue</li></ul>
+        <a class="btn ghost" href="/pricing.html">Go Yearly</a></div>
+    </div>
+  </section>
+
+  <footer>© PromptCanvas AI · <a href="/pricing.html" style="color:var(--mut)">Pricing</a> · <a href="/auth.html" style="color:var(--mut)">Sign in</a></footer>
+</div>
+<div class="mobilenav">
+  <a href="/" class="on"><span>🏠</span>Home</a>
+  <a href="/pricing.html"><span>💳</span>Pricing</a>
+  <a href="/app.html"><span>🖼️</span>Studio</a>
+  <a href="/auth.html"><span>👤</span>Account</a>
+</div>
+<script src="/js/api.js"></script><script src="/js/index.js"></script>
+</body></html>

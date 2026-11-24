@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Editor - PromptCanvas AI</title><link rel="icon" href="/assets/logo.svg"><link rel="stylesheet" href="/css/style.css">
+</head><body>
+<div class="wrap">
+  <nav class="nav">
+    <a class="brand" href="/"><span class="dot">P</span><span>PromptCanvas<small>AI IMAGE STUDIO</small></span></a>
+    <div class="navlinks">
+      <a href="/app.html">Dashboard</a><a href="/editor.html" class="on">Editor</a><a href="/pricing.html">Pricing</a>
+      <button class="btn sm ghost" onclick="signOut()">Sign out</button>
+    </div>
+  </nav>
+  <div class="edlayout">
+    <div class="toolrail" id="toolrail"></div>
+    <main>
+      <div class="canvasbox" id="stage">
+        <div class="drophint" id="drop">Drop a photo here, tap to upload<br><span class="sm">JPG, PNG or WebP, up to 6 MB</span></div>
+        <input type="file" id="file" accept="image/*" class="hidden">
+        <div id="result" class="hidden" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:12px"></div>
+        <div id="working" class="hidden" style="display:flex;flex-direction:column;align-items:center;gap:12px">
+          <div class="spin"></div><div class="mut sm" id="workMsg">Working with the AI…</div>
+        </div>
+        <canvas id="maskCanvas" class="hidden" style="position:absolute;cursor:crosshair;border-radius:12px"></canvas>
+      </div>
+      <div id="maskHud" class="maskhud hidden">
+        <span>Brush over what should disappear</span>
+        <span class="rowflex"><button class="btn sm ghost" onclick="undoMask()">Undo</button><button class="btn sm ghost" onclick="clearMask()">Clear</button></span>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <label id="promptLabel" for="prompt">Describe your edit</label>
+        <textarea id="prompt" rows="3" placeholder="e.g. turn this into a neon cyberpunk city at night"></textarea>
+        <div class="rowflex" style="margin-top:12px">
+          <span class="mut sm" id="toolHint"></span><span class="spacer"></span>
+          <button class="btn primary" id="runBtn" onclick="runEdit()">Apply AI edit</button>
+        </div>
+      </div>
+      <div class="adslot" id="adBanner"></div>
+    </main>
+    <aside class="ehist">
+      <div class="stat"><div class="k">Credits left</div><div class="v" id="crV">…</div><div class="sm mut" id="crSub"></div></div>
+      <div class="sm mut" style="font-weight:700;margin-top:6px">HISTORY</div>
+      <div class="ehist" id="histList"></div>
+    </aside>
+  </div>
+  <footer>© PromptCanvas AI</footer>
+</div>
+<div class="mobilenav">
+  <a href="/app.html"><span>🏠</span>Home</a>
+  <a href="/editor.html" class="on"><span>✨</span>Editor</a>
+  <a href="/pricing.html"><span>💳</span>Pricing</a>
+  <a href="/account.html"><span>👤</span>Account</a>
+</div>
+<div class="toasts" id="toasts"></div>
+<script src="/js/api.js"></script><script src="/js/ads.js"></script><script src="/js/editor.js"></script>
+</body></html>
