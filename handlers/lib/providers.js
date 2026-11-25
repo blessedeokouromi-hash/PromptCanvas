@@ -8,10 +8,13 @@
 // - Replicate: real upscaling (Real-ESRGAN) + object removal (LaMa) (REPLICATE_API_TOKEN).
 
 
-function needsResult(r, service) {
-  if (r.status === 402) throw new Error(service + " is out of credits for this key");
-  if (r.status === 401 || r.status === 403) throw new Error(service + " rejected the API key");
-  if (!r.ok) throw new Error(service + " error (HTTP " + r.status + ")");
+async function needsResult(r, service) {
+  if (r.ok) return;
+  let body = "";
+  try { body = ", response: " + (await r.text()).slice(0, 160); } catch (e) {}
+  if (r.status === 402) throw new Error(service + " is out of credits for this key" + body);
+  if (r.status === 401 || r.status === 403) throw new Error(service + " rejected the API key (HTTP " + r.status + ")" + body);
+  throw new Error(service + " error (HTTP " + r.status + ")" + body);
 }
 
 async function fetchWithTimeout(url, opts, ms) {
@@ -50,7 +53,7 @@ async function pollinations(kind, prompt, imageUrl, dims) {
       if (r.ok) break;
     }
   }
-  needsResult(r, "Pollinations AI");
+  await needsResult(r, "Pollinations AI");
   const buf = Buffer.from(await r.arrayBuffer());
   if (!buf.length) throw new Error("Pollinations AI returned an empty image");
   return buf;
@@ -76,7 +79,7 @@ async function removeBg(imageUrl) {
   const r = await fetchWithTimeout("https://api.remove.bg/v1.0/removebg", {
     method: "POST", headers: { "X-Api-Key": key }, body: fd
   }, 90000);
-  needsResult(r, "remove.bg");
+  await needsResult(r, "remove.bg");
   const buf = Buffer.from(await r.arrayBuffer());
   if (!buf.length) throw new Error("remove.bg returned an empty image");
   return buf;
@@ -91,7 +94,7 @@ async function replicateRun(model, input) {
     headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" },
     body: JSON.stringify({ input })
   }, 30000);
-  needsResult(r0, "Replicate");
+  await needsResult(r0, "Replicate");
   let pred = await r0.json();
   const started = Date.now();
   while (pred && pred.status !== "succeeded" && pred.status !== "failed" && pred.status !== "canceled" && Date.now() - started < 90000) {
