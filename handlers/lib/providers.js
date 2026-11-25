@@ -29,24 +29,51 @@ async function pollinationsToken() {
   return null;
 }
 
-// text-to-image with Flux (no key needed), or image-to-image with Kontext (key needed).
+// text-to-image with Flux (no key needed, Classic API), or image-to-image via
+// the keyed gen API (POST /v1/images/edits, OpenAI-compatible).
 async function pollinations(kind, prompt, imageUrl, dims) {
   const p = encodeURIComponent((prompt || "").slice(0, 800));
   const w = Math.min(dims && dims.width || 1024, 2048);
   const h = Math.min(dims && dims.height || 1024, 2048);
   const token = await pollinationsToken();
+  if (imageUrl) {
+    if (!token) throw new Error(
+      "Prompt-based editing needs a free Pollinations AI token. Create one at enter.pollinations.ai and save it as POLLINATIONS_TOKEN in the project settings. (Background generation works without any key.)");
+    const r = await fetchWithTimeout("https://gen.pollinations.ai/v1/images/edits", {
+      method: "POST",
+      headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        prompt: (prompt || "").slice(0, 32000),
+        image: imageUrl,
+        model: process.env.POLLINATIONS_EDIT_MODEL || "black-forest-labs/flux.1-kontext-pro",
+        size: w + "x" + h,
+        response_format: "b64_json"
+      })
+    }, 110000);
+    await needsResult(r, "Pollinations AI");
+    const j = await r.json();
+    const d = (j.data && j.data[0]) || j;
+    if (d.b64_json) {
+      const buf = Buffer.from(d.b64_json, "base64");
+      if (!buf.length) throw new Error("Pollinations AI returned an empty image");
+      return buf;
+    }
+    if (d.url) {
+      const r2 = await fetch(d.url);
+      const buf = Buffer.from(await r2.arrayBuffer());
+      if (!buf.length) throw new Error("Pollinations AI returned an empty image");
+      return buf;
+    }
+    throw new Error("Pollinations AI returned no image data");
+  }
   let url = "https://image.pollinations.ai/prompt/" + p +
-    "?model=" + (imageUrl ? "kontext" : "flux") +
-    "&width=" + w + "&height=" + h + "&nologo=true&enhance=false";
-  if (imageUrl) url += "&image=" + encodeURIComponent(imageUrl);
+    "?model=flux&width=" + w + "&height=" + h + "&nologo=true&enhance=false";
   if (token) url += "&token=" + encodeURIComponent(token);
-  if (imageUrl && !token) throw new Error(
-    "Prompt-based editing needs a free Pollinations AI token. Create one at enter.pollinations.ai and save it as POLLINATIONS_TOKEN in the project settings. (Background generation works without any key.)");
   const headers = token ? { Authorization: "Bearer " + token } : {};
   url += "&referrer=promptcanvas";
   let r = await fetchWithTimeout(url, { method: "GET", headers }, 110000);
   // The free tier rate-limits per IP (~1 image/minute); spaced retries absorb that.
-  if ((r.status === 402 || r.status === 429 || r.status === 503) && !imageUrl) {
+  if (r.status === 402 || r.status === 429 || r.status === 503) {
     for (const wait of [20000, 40000]) {
       await new Promise(res => setTimeout(res, wait));
       r = await fetchWithTimeout(url, { method: "GET", headers }, 110000);
