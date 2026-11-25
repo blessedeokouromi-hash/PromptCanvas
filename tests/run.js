@@ -17,7 +17,7 @@ const { wrap } = require("./server");
 
 const emuServer = http.createServer((req, res) => emu.handler(req, res)).listen(4401);
 
-function api(name){ return require("../api/" + name); }
+function api(name){ return require("../handlers/" + name); }
 const servers = {};
 ["me","upload","edit","history","ads","edit-status",
  "payments/init","payments/verify","payments/webhook-paystack","payments/webhook-flutterwave","payments/history",
