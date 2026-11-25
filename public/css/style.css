@@ -138,3 +138,15 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--mut);font-siz
   .mobilenav a span{display:block;font-size:17px;margin-bottom:2px}
   body{padding-bottom:64px}
 }
+
+/* mobile layout overrides (kept last so they win the cascade) */
+@media(max-width:1000px){
+  .edlayout{grid-template-columns:76px 1fr}
+  .ehist{display:none}
+}
+@media(max-width:700px){
+  .edlayout{display:block;padding:14px 0 90px}
+  .toolrail{display:flex;flex-direction:row;gap:8px;overflow-x:auto;position:static;-webkit-overflow-scrolling:touch;padding:2px 2px 6px}
+  .tool{flex:0 0 auto;min-width:84px}
+  .side{position:static}
+}
