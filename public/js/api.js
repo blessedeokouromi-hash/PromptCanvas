@@ -28,3 +28,5 @@ function toast(msg, kind){
   box.appendChild(el);
   setTimeout(()=>{ el.style.opacity="0"; el.style.transition="opacity .4s"; setTimeout(()=>el.remove(), 400); }, kind==="err"?6000:3500);
 }
+
+if ("serviceWorker" in navigator) { addEventListener("load", function(){ navigator.serviceWorker.register("/sw.js").catch(function(){}); }); }
