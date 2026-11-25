@@ -6,7 +6,7 @@ const { cors, bearer, json, readJson, rateLimit } = require("./lib/util");
 const { who, adminRest, config } = require("./lib/supa");
 const providers = require("./lib/providers");
 
-const KINDS = ["prompt_edit", "bg_replace", "bg_generate", "portrait", "img2img", "bg_remove", "upscale", "object_remove"];
+const KINDS = ["prompt_edit", "bg_replace", "bg_generate", "portrait", "img2img", "bg_remove", "upscale", "object_remove", "animate"];
 
 function finalPrompt(kind, prompt) {
   const p = (prompt || "").trim();
@@ -34,10 +34,11 @@ module.exports = async (req, res) => {
     const body = await readJson(req, 2);
     const kind = body.kind;
     if (!KINDS.includes(kind)) return json(res, 400, { error: "Unknown editing action" });
+    const cost = kind === "animate" ? 5 : 1; // AI video costs real money per clip
 
     // ---- Atomic credit claim (SQL function: free daily reset + premium check) ----
     const claimed = await adminRest("POST", "/rest/v1/rpc/claim_credit",
-      { p_uid: user.id, p_cost: 1 });
+      { p_uid: user.id, p_cost: cost });
     // PostgREST returns [true] / [false]
     const ok = Array.isArray(claimed) ? claimed[0] : claimed;
     if (!ok) return json(res, 402, { error: "No credits left. Free accounts get 2 every day; Premium gets 100 every month." });
@@ -65,6 +66,10 @@ module.exports = async (req, res) => {
           if (!maskUrl) throw new Error("Brush over the object you want removed first");
           bytes = await providers.objectRemove(inputUrl, maskUrl, user.id); usedProvider = "Replicate LaMa inpainting";
           break;
+        case "animate":
+          if (!inputUrl) throw new Error("Upload an image first");
+          bytes = await providers.animate(inputUrl, body.prompt); ctype = "video/mp4"; usedProvider = "Replicate Wan 2.2 video";
+          break;
         case "bg_generate":
           bytes = await providers.pollinations("bg_generate", finalPrompt(kind, body.prompt), null, body); usedProvider = "Pollinations Flux";
           break;
@@ -81,7 +86,7 @@ module.exports = async (req, res) => {
         }
       }
 
-      const ext = ctype.includes("png") ? "png" : "jpg";
+      const ext = ctype.includes("png") ? "png" : (ctype.includes("video") ? "mp4" : "jpg");
       const outPath = "results/" + user.id + "/" + kind + "-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8) + "." + ext;
       // bytes -> storage
       const { upload } = require("./lib/storage");
@@ -90,13 +95,13 @@ module.exports = async (req, res) => {
 
       const row = await adminRest("POST", "/rest/v1/edits",
         { user_id: user.id, kind, prompt: body.prompt || null, input_path: body.input_path || null,
-          output_path: outPath, status: "done", credits_spent: 1, provider: usedProvider });
+          output_path: outPath, status: "done", credits_spent: cost, provider: usedProvider });
       const editId = row && row[0] && row[0].id;
       json(res, 200, { ok: true, edit_id: editId, url: resultUrl, provider: usedProvider });
     } catch (e) {
       failed = e.message;
       // ---- Refund the credit: processing failed, the user keeps their credit ----
-      try { await adminRest("POST", "/rest/v1/rpc/refund_credit", { p_uid: user.id, p_cost: 1 }); } catch (e2) {}
+      try { await adminRest("POST", "/rest/v1/rpc/refund_credit", { p_uid: user.id, p_cost: cost }); } catch (e2) {}
       json(res, 502, { error: failed, refunded: true });
     }
   } catch (e) { json(res, 500, { error: e.message }); }

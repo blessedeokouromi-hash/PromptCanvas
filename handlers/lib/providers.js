@@ -165,4 +165,16 @@ async function objectRemove(imageUrl, maskUrl) {
   }
 }
 
-module.exports = { pollinations, removeBg, upscale, objectRemove, replicateEdit, storeResult: null };
+async function animate(imageUrl, prompt) {
+  try {
+    const buf = await replicateRun(process.env.REPLICATE_VIDEO_MODEL || "wavespeedai/wan-2.2-i2v-fast",
+      { image: imageUrl, prompt: (prompt || "").trim() || "gentle cinematic motion, the scene comes alive naturally" });
+    if (!buf) throw new Error("no-token");
+    return buf;
+  } catch (e) {
+    if (e.message === "no-token") throw new Error("Video generation needs a Replicate API token (REPLICATE_API_TOKEN). Save it in the project settings and this tool turns on.");
+    throw e;
+  }
+}
+
+module.exports = { pollinations, removeBg, upscale, objectRemove, animate, replicateEdit, storeResult: null };

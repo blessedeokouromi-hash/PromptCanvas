@@ -7,7 +7,8 @@ const TOOLS = [
   { id:"img2img",       icon:"🔁", name:"Image to image", hint:"Describe the style or transformation.", prompt:true, input:true },
   { id:"bg_remove",     icon:"🪄", name:"Remove BG",     hint:"Cuts the subject out (needs remove.bg key).", prompt:false, input:true },
   { id:"upscale",       icon:"💎", name:"Upscale 2x",    hint:"Sharper, bigger photo (needs Replicate key).", prompt:false, input:true },
-  { id:"object_remove", icon:"🧽", name:"Remove object", hint:"Brush over the object, then apply (needs Replicate key).", prompt:false, input:true, mask:true }
+  { id:"object_remove", icon:"🧽", name:"Remove object", hint:"Brush over the object, then apply (needs Replicate key).", prompt:false, input:true, mask:true },
+  { id:"animate", icon:"🎬", name:"Animate", hint:"Turn the photo into a short AI video (5 credits).", prompt:true, input:true, keyreq:true, video:true }
 ];
 let tool = "prompt_edit", curInput = null, curMask = null, history = [];
 
@@ -28,13 +29,17 @@ function setImage(url){ curInput = url; document.getElementById("drop").classLis
   stage.innerHTML = '<div class="imgstage"><img id="curImg" src="'+url+'" alt="Working image"></div><div class="compare"><a class="btn sm ghost" id="dlBtn" download="promptcanvas.png" href="'+url+'">Download</a><button class="btn sm ghost" onclick="resetCanvas()">Change photo</button></div>';
   renderTools(); syncMaskCanvas();
 }
+function setVideo(url){ curInput = url; document.getElementById("drop").classList.add("hidden");
+  const stage = document.getElementById("result"); stage.classList.remove("hidden");
+  stage.innerHTML = '<div class="imgstage"><video controls autoplay loop muted playsinline src="'+url+'"></video></div><div class="compare"><a class="btn sm ghost" download="promptcanvas.mp4" href="'+url+'">Download</a><button class="btn sm ghost" onclick="resetCanvas()">Change photo</button></div>';
+}
 function resetCanvas(){ curInput = null; curMask = null; document.getElementById("result").classList.add("hidden");
   const d = document.getElementById("drop"); d.classList.remove("hidden"); syncMaskCanvas(); renderTools(); }
 async function loadHistory(){
   try { const h = await PC.api("/api/history"); history = (h.edits||[]).filter(e=>e.output_url);
     const list = document.getElementById("histList");
     list.innerHTML = history.slice(0,20).map(e =>
-      '<a class="edcard" onclick="setImage(\''+e.output_url+'\');return false" href="javascript:void 0"><img loading="lazy" src="'+e.output_url+'" alt=""><div class="m"><span>'+e.kind.replace(/_/g," ")+'</span></div></a>').join("");
+      '<a class="edcard" onclick="'+(e.output_url.indexOf(".mp4")>=0?"setVideo":"setImage")+'(\''+e.output_url+'\');return false" href="javascript:void 0">'+(e.output_url.indexOf(".mp4")>=0?'<video muted playsinline src="'+e.output_url+'"></video>':'<img loading="lazy" src="'+e.output_url+'" alt="">')+'<div class="m"><span>'+e.kind.replace(/_/g," ")+'</span></div></a>').join("");
   } catch(e){}
 }
 async function refreshCredits(){
@@ -50,13 +55,13 @@ async function runEdit(){
   if (t.mask && !curMask) { toast("Brush over the object you want removed first.", "err"); return; }
   const btn = document.getElementById("runBtn"); btn.disabled = true;
   document.getElementById("working").classList.remove("hidden");
-  document.getElementById("workMsg").textContent = "Working with the AI… this can take up to a minute";
+  document.getElementById("workMsg").textContent = tool === "animate" ? "Creating your video… this can take up to 2 minutes" : "Working with the AI… this can take up to a minute";
   try {
     const body = { kind: tool, prompt: document.getElementById("prompt").value.trim(),
       input_path: curInput ? pathFromUrl(curInput) : null };
     if (t.mask && curMask) body.mask_path = await uploadMask();
     const r = await PC.api("/api/edit", { method:"POST", body: JSON.stringify(body) });
-    setImage(r.url); loadHistory(); refreshCredits();
+    (r.url.indexOf(".mp4")>=0 ? setVideo(r.url) : setImage(r.url)); loadHistory(); refreshCredits();
     toast(r.provider ? "Done with " + r.provider : "Done", "ok");
   } catch(e){
     toast(e.message.includes("No credits left") ? "No credits left. " + e.message : e.message, "err");
