@@ -18,7 +18,8 @@ function renderTools(){
     '<button class="tool ' + (t.id===tool?"on":"") + '" onclick="pickTool(\'' + t.id + '\')"><span class="ticon">' + t.icon + '</span>' + t.name + (t.keyreq?'<span class="req" title="needs an API key"></span>':'') + '</button>').join("");
   const t = TOOLS.find(x=>x.id===tool);
   document.getElementById("promptLabel").textContent = t.id==="bg_generate" ? "Describe the background" : "Describe your edit";
-  document.getElementById("prompt").parentElement.style.display = t.prompt ? "" : "none";
+  document.getElementById("promptLabel").style.display = t.prompt ? "" : "none";
+  document.getElementById("prompt").style.display = t.prompt ? "" : "none";
   document.getElementById("toolHint").textContent = t.hint || "";
   document.getElementById("runBtn").textContent = t.id==="bg_generate" ? "Generate background" : "Apply AI edit";
   document.getElementById("maskHud").classList.toggle("hidden", !t.mask || !curInput);
